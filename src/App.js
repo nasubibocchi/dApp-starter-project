@@ -11,7 +11,6 @@ const App = () => {
   const [messageValue, setMessageValue] = useState("");
   const [allWaves, setAllWaves] = useState("");
   const [waveStatus, setWaveStatus] = useState("");
-  const [resultMessage, setResultMessage] = useState("");
 
   const contractAddress = "0x601615D6A5F10A458cc54F5EC89543e0a083D2Cb";
   const contractABI = abi.abi;
@@ -131,8 +130,6 @@ const App = () => {
 
   // waveの回数をカウントする関数を実装
   const wave = async () => {
-    setResultMessage("");
-
     try {
       const { ethereum } = window;
       if (ethereum) {
@@ -174,15 +171,10 @@ const App = () => {
           wavePortalContract.address
         );
 
-        // 機能追加
-        let resultMessage = "";
-
         if (contractBalance_post < contractBalance) {
-          resultMessage = setResultMessage("User won ETH!");
-          console.log(resultMessage);
+          console.log("User won ETH!");
         } else {
-          resultMessage = setResultMessage("User did'nt win ETH.");
-          console.log(resultMessage);
+          console.log("User did'nt win ETH.");
         }
         console.log(
           "Contract balance after wave:",
@@ -285,7 +277,6 @@ const App = () => {
                   <div>Address: {wave.address}</div>
                   <div>Time: {wave.timestamp.toString()}</div>
                   <div>Message: {wave.message}</div>
-                  <div>{resultMessage}</div>
                 </div>
               );
             })}
