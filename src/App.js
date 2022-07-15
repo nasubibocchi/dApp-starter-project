@@ -10,6 +10,9 @@ const App = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [messageValue, setMessageValue] = useState("");
   const [allWaves, setAllWaves] = useState("");
+  const [waveStatus, setWaveStatus] = useState("");
+  const [resultMessage, setResultMessage] = useState("");
+
   const contractAddress = "0x601615D6A5F10A458cc54F5EC89543e0a083D2Cb";
   const contractABI = abi.abi;
 
@@ -128,6 +131,8 @@ const App = () => {
 
   // waveの回数をカウントする関数を実装
   const wave = async () => {
+    setResultMessage("");
+
     try {
       const { ethereum } = window;
       if (ethereum) {
@@ -154,19 +159,30 @@ const App = () => {
         const waveTxn = await wavePortalContract.wave(messageValue, {
           gasLimit: 300000,
         });
-        console.log("Mining...", waveTxn.hash);
+        let status = setWaveStatus("Mining...");
+        console.log(status, waveTxn.hash);
         await waveTxn.wait();
-        console.log("Mined -- ", waveTxn.hash);
+
+        status = setWaveStatus("Mined -- ");
+        console.log(status, waveTxn.hash);
         count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
+
+        status = setWaveStatus("");
 
         let contractBalance_post = await provider.getBalance(
           wavePortalContract.address
         );
+
+        // 機能追加
+        let resultMessage = "";
+
         if (contractBalance_post < contractBalance) {
-          console.log("User won ETH!");
+          resultMessage = setResultMessage("User won ETH!");
+          console.log(resultMessage);
         } else {
-          console.log("User did'nt win ETH.");
+          resultMessage = setResultMessage("User did'nt win ETH.");
+          console.log(resultMessage);
         }
         console.log(
           "Contract balance after wave:",
@@ -238,6 +254,17 @@ const App = () => {
             }}
           />
         )}
+        {/* ステータスを表示する */}
+        {waveStatus != null && (
+          <div
+            style={{
+              fontWeight: "bold",
+              margin: "16px",
+            }}
+          >
+            <div>{waveStatus}</div>
+          </div>
+        )}
         {/* 履歴を表示する */}
         {currentAccount &&
           allWaves.length > 0 &&
@@ -258,6 +285,7 @@ const App = () => {
                   <div>Address: {wave.address}</div>
                   <div>Time: {wave.timestamp.toString()}</div>
                   <div>Message: {wave.message}</div>
+                  <div>{resultMessage}</div>
                 </div>
               );
             })}
